@@ -1,10 +1,11 @@
 import javafx.scene.image.Image;
 
+import java.util.Objects;
+
 /**
  * @author Bo Han Zhu
  * @version 1.0
  */
-
 public class Card {
     private String suit;
     private boolean special;
@@ -46,23 +47,36 @@ public class Card {
 
     /**
      *
-     * @return
+     * @return the value of the Card.
      */
     public int getValue() {
         return this.value;
     }
 
+    /**
+     *
+     * @return the Image of the Card.
+     */
     public Image getImage() {
         return this.image;
     }
 
+    /**
+     * This is only for debugging purposes.
+     * @return the suit and the value.
+     */
     @Override
     public String toString() {
         return this.suit + " " + this.value;
     }
 
+    /**
+     * This equals method only compares the values of the Cards, not anything else.
+     * @param obj object being compared to.
+     * @return true if the values are equal, false otherwise.
+     */
     @Override
-    public boolean equals (Object obj) {
+    public boolean equals(Object obj) {
         if (obj == null || !(obj instanceof Card)) {
             return false;
         }
@@ -70,4 +84,8 @@ public class Card {
         return this.value == other.value;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(suit, value);
+    }
 }

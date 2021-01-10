@@ -3,6 +3,10 @@ import java.util.Collections;
 
 import javafx.scene.image.Image;
 
+/**
+ * @author Bo Han Zhu
+ * @version 1.0
+ */
 public class Deck {
     private Card c1;
     private Card c2;
@@ -57,6 +61,10 @@ public class Deck {
     private Card c51;
     private Card c52;
 
+    /**
+     * Only constructor for a deck.
+     * Creates a standard Deck object containing the 52 Cards.
+     */
     public Deck() {
         this.c1 = new Card("spade", false, 2, 1, new Image("JPEG/2S.jpg"));
         this.c2 = new Card("spade", false, 3, 1, new Image("JPEG/3S.jpg"));
@@ -113,6 +121,10 @@ public class Deck {
 
     }
 
+    /**
+     * Shuffles a Deck object randomly and transforms it into an ArrayList for easier usage.
+     * @return ArrayList of Cards that is shuffled.
+     */
     public ArrayList<Card> toShuffledArrayList() {
         ArrayList<Card> out = new ArrayList<Card>();
         out.add(this.c1);
