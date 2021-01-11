@@ -34,12 +34,13 @@ public class Run extends Application {
     private final int maxBotSlapSpeed = 500; //actually is this value + minBotSlapSpeed
     private Timer timer; //timer for many TimerTasks
     private Random rand = new Random(); //to give randomness to bot slapping speeds and mess-ups
-    public static int humanNumOfTimes = 1; //the number of times a human needs to play after a card
-    public static int botNumOfTimes = 1; // the number of times a bot needs to play after a card
-    public static boolean humanGo = true; //tracker variable for if bot can take pile (false = take)
-    public static int botTake = -1; //tracker variable for if bot can take pile (0 = take)
-    public static boolean botGo = true; //tracker variable for if human can take pile (false = take)
-    public static int humanTake = -1; //tracker variable for if human can take pile (0 = take)
+    static int humanNumOfTimes = 1; //the number of times a human needs to play after a card
+    static int botNumOfTimes = 1; // the number of times a bot needs to play after a card
+    static boolean humanGo = true; //tracker variable for if bot can take pile (false = take)
+    static int botTake = -1; //tracker variable for if bot can take pile (0 = take)
+    static boolean botGo = true; //tracker variable for if human can take pile (false = take)
+    static int humanTake = -1; //tracker variable for if human can take pile (0 = take)
+    private static boolean display = true; //on/off variable for results screen (true = on)
 
     /**
      * Default constructor, used for debugging purposes.
@@ -315,62 +316,83 @@ public class Run extends Application {
                 //Checks for bot victory
                 if (human.howManyCards() <= 0 && !canSlap(pile) && botGo) {
                     this.stop();
-                    Platform.runLater(() -> {
-                        Text text = new Text("You Lost!");
-                        text.setFont(Font.font("Edwardian Script ITC", 80));
-                        text.setFill(Color.RED);
-                        Button quit = new Button("Quit");
-                        quit.setBackground(new Background(darkSlateGrayBackgroundFill));
-                        quit.setFont(Font.font("STENCIL", 25));
-                        quit.setTextFill(Color.WHITE);
-                        quit.setPrefSize(150, 50);
-                        quit.setShape(new Polygon(0, 0, 150, 0, 120, 50, 30, 50));
+                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            if (human.howManyCards() <= 0 && display) {
+                                display = false;
+                                Platform.runLater(() -> {
+                                    Text text = new Text("You Lost!");
+                                    text.setFont(Font.font("Edwardian Script ITC", 80));
+                                    text.setFill(Color.RED);
+                                    Button quit = new Button("Quit");
+                                    quit.setBackground(new Background(darkSlateGrayBackgroundFill));
+                                    quit.setFont(Font.font("STENCIL", 25));
+                                    quit.setTextFill(Color.WHITE);
+                                    quit.setPrefSize(150, 50);
+                                    quit.setShape(new Polygon(0, 0, 150, 0, 120, 50, 30, 50));
 
-                        VBox column = new VBox();
-                        column.setSpacing(30);
-                        column.setAlignment(Pos.CENTER);
-                        column.getChildren().addAll(text, quit);
+                                    VBox column = new VBox();
+                                    column.setSpacing(30);
+                                    column.setAlignment(Pos.CENTER);
+                                    column.getChildren().addAll(text, quit);
 
-                        BorderPane borderPane = new BorderPane();
-                        borderPane.setCenter(column);
-                        borderPane.setBackground(background);
-                        quit.setOnAction(e -> {
-                            System.exit(0);
-                        });
-                        Scene defeat = new Scene(borderPane, width, height);
-                        primaryStage.setScene(defeat);
-                        primaryStage.show();
-                    });
+                                    BorderPane borderPane = new BorderPane();
+                                    borderPane.setCenter(column);
+                                    borderPane.setBackground(background);
+                                    quit.setOnAction(e -> {
+                                        System.exit(0);
+                                    });
+                                    Scene defeat = new Scene(borderPane, width, height);
+                                    primaryStage.setScene(defeat);
+                                    primaryStage.show();
+                                });
+                            }
+                        }
+                    }, 550);
+                    this.start();
                 }
                 //Checks for human victory
                 if (bot.howManyCards() <= 0 && !canSlap(pile) && humanGo) {
                     this.stop();
-                    Platform.runLater(() -> {
-                        Text text = new Text("You Win!");
-                        text.setFont(Font.font("Edwardian Script ITC", 80));
-                        text.setFill(Color.WHITE);
-                        Button quit = new Button("Quit");
-                        quit.setBackground(new Background(darkSlateGrayBackgroundFill));
-                        quit.setFont(Font.font("STENCIL", 25));
-                        quit.setTextFill(Color.WHITE);
-                        quit.setPrefSize(150, 50);
-                        quit.setShape(new Polygon(0, 0, 150, 0, 120, 50, 30, 50));
+                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            if (bot.howManyCards() <= 0 && display) {
+                                display = false;
+                                Platform.runLater(() -> {
+                                    Text text = new Text("You Win!");
+                                    text.setFont(Font.font("Edwardian Script ITC", 80));
+                                    text.setFill(Color.WHITE);
+                                    Button quit = new Button("Quit");
+                                    quit.setBackground(new Background(darkSlateGrayBackgroundFill));
+                                    quit.setFont(Font.font("STENCIL", 25));
+                                    quit.setTextFill(Color.WHITE);
+                                    quit.setPrefSize(150, 50);
+                                    quit.setShape(new Polygon(0, 0, 150, 0, 120, 50, 30, 50));
 
-                        VBox column = new VBox();
-                        column.setSpacing(30);
-                        column.setAlignment(Pos.CENTER);
-                        column.getChildren().addAll(text, quit);
+                                    VBox column = new VBox();
+                                    column.setSpacing(30);
+                                    column.setAlignment(Pos.CENTER);
+                                    column.getChildren().addAll(text, quit);
 
-                        BorderPane borderPane = new BorderPane();
-                        borderPane.setCenter(column);
-                        borderPane.setBackground(background);
-                        quit.setOnAction(e -> {
-                            System.exit(0);
-                        });
-                        Scene victory = new Scene(borderPane, width, height);
-                        primaryStage.setScene(victory);
-                        primaryStage.show();
-                    });
+                                    BorderPane borderPane = new BorderPane();
+                                    borderPane.setCenter(column);
+                                    borderPane.setBackground(background);
+                                    quit.setOnAction(e -> {
+                                        System.exit(0);
+                                    });
+                                    Scene victory = new Scene(borderPane, width, height);
+                                    primaryStage.setScene(victory);
+                                    primaryStage.show();
+                                });
+                            }
+
+                        }
+                    }, 550);
+                    this.start();
                 }
             }
         }.start();
