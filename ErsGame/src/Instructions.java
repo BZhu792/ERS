@@ -106,8 +106,7 @@ public class Instructions extends Application {
 
         returnToMenu.setOnAction(e -> {
             if (returnToMenu.getText().equals("Return to Menu")) {
-                primaryStage.close();
-                Platform.runLater(() -> new Menu().start(new Stage()));
+                new Menu().start(primaryStage);
             } else {
                 primaryStage.close();
             }

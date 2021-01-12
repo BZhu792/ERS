@@ -135,12 +135,10 @@ public class Menu extends Application {
             }
         }.start();
         play.setOnAction(e -> {
-            primaryStage.close();
-            Platform.runLater(() -> new Difficulty().start(new Stage()));
+            new Difficulty().start(primaryStage);
         });
         instructions.setOnAction(e -> {
-            primaryStage.close();
-            Platform.runLater(() -> new Instructions("From Menu").start(new Stage()));
+            new Instructions("From Menu").start(primaryStage);
         });
         Scene scene = new Scene(borderPane, width, height);
         primaryStage.setTitle("ERS");

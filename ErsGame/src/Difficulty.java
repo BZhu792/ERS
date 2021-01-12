@@ -36,8 +36,7 @@ public class Difficulty extends Application {
         hard.setTextFill(Color.WHITE);
         hard.setPrefSize(120, 30);
         hard.setOnAction(e -> {
-            primaryStage.close();
-            Platform.runLater(() -> new Run(50, 650).start(new Stage()));
+            new Run(50, 650).start(primaryStage);
         });
 
         BackgroundFill[] grayBackgroundFill = new BackgroundFill[1];
@@ -48,8 +47,7 @@ public class Difficulty extends Application {
         medium.setTextFill(Color.WHITE);
         medium.setPrefSize(120, 30);
         medium.setOnAction(e -> {
-            primaryStage.close();
-            Platform.runLater(() -> new Run(35, 800).start(new Stage()));
+            new Run(35, 800).start(primaryStage);
         });
 
         BackgroundFill[] darkGrayBackgroundFill = new BackgroundFill[1];
@@ -60,8 +58,7 @@ public class Difficulty extends Application {
         easy.setTextFill(Color.WHITE);
         easy.setPrefSize(120, 30);
         easy.setOnAction(e -> {
-            primaryStage.close();
-            Platform.runLater(() -> new Run(20, 1000).start(new Stage()));
+            new Run(20, 1000).start(primaryStage);
         });
 
         BackgroundFill[] lightGrayBackgroundFill = new BackgroundFill[1];
@@ -72,9 +69,9 @@ public class Difficulty extends Application {
         novice.setFont(Font.font("STENCIL", FontWeight.BOLD, 15));
         novice.setPrefSize(120, 30);
         novice.setOnAction(e -> {
-            primaryStage.close();
-            Platform.runLater(() -> new Run(10, 1250).start(new Stage()));
+            new Run(10, 1250).start(primaryStage);
         });
+
 
         VBox layout = new VBox();
         layout.setAlignment(Pos.CENTER);
