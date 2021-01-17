@@ -121,17 +121,9 @@ public class Run extends Application {
         activity.setFill(Color.WHITE);
 
         //initialize card display
-        ImageView cardOnPile = new ImageView();
-        Image black = new Image("JPEG/black.jpg");
-        try {
-            cardOnPile.setImage(pile.get(pile.size() - 1).getImage());
-        } catch (Exception e) {
-            cardOnPile.setImage(black);
-        }
-        cardOnPile.setFitWidth(100);
-        cardOnPile.setFitHeight(153);
-        cardOnPile.setSmooth(true);
-        cardOnPile.setCache(true);
+        StackPane stackPane = new StackPane();
+        stackPane.setPrefSize(200, 200);
+
 
         //initialize card count displays using VBox
         Text hCardsRemaining = new Text("Player cards remaining: " + human.howManyCards());
@@ -175,7 +167,7 @@ public class Run extends Application {
         //design main VBox Layout
         VBox mainVBox = new VBox();
         mainVBox.setSpacing(10);
-        mainVBox.getChildren().addAll(score, cardOnPile, activity, buttons);
+        mainVBox.getChildren().addAll(score, stackPane, activity, buttons);
         mainVBox.setAlignment(Pos.CENTER);
 
         //design overall BorderPane Layout
@@ -200,8 +192,8 @@ public class Run extends Application {
         primaryStage.setScene(scene);
 
         //implement USER buttons
-        playCard.setOnAction(new PlayerPlay(human, bot, pile, burnPile, cardOnPile, activity, hCardsRemaining, pileCards, counter));
-        slapDeck.setOnAction(new PlayerSlap(human, bot, pile, burnPile, cardOnPile, black, activity, hCardsRemaining, pileCards));
+        playCard.setOnAction(new PlayerPlay(human, bot, pile, burnPile, activity, hCardsRemaining, pileCards, counter, stackPane));
+        slapDeck.setOnAction(new PlayerSlap(human, bot, pile, burnPile, activity, hCardsRemaining, pileCards, stackPane));
 
         new AnimationTimer() {
             @Override
@@ -219,15 +211,15 @@ public class Run extends Application {
                     messUp.setValue(minTurnMessUp + rand.nextInt(maxTurnMessUp));
                     timer = new Timer();
                     if (!canSlap(pile)) {
-                        timer.schedule(new BotMisSlap(bot, pile, burnPile, cardOnPile, activity, bCardsRemaining, pileCards), 100);
+                        timer.schedule(new BotMisSlap(bot, pile, burnPile, activity, bCardsRemaining, pileCards), 100);
                     }
                 }
                 //Check for if human/bot can slap
                 if (canSlap(pile)) {
                     this.stop();
-                    slapDeck.setOnAction(new PlayerSlap(human, bot, pile, burnPile, cardOnPile, black, activity, hCardsRemaining, pileCards));
+                    slapDeck.setOnAction(new PlayerSlap(human, bot, pile, burnPile, activity, hCardsRemaining, pileCards, stackPane));
                     timer = new Timer();
-                    timer.schedule(new BotSlap(human, bot, pile, burnPile, cardOnPile, black, activity, bCardsRemaining, pileCards), minBotSlapSpeed + rand.nextInt(maxBotSlapSpeed));
+                    timer.schedule(new BotSlap(human, bot, pile, burnPile, activity, bCardsRemaining, pileCards, stackPane), minBotSlapSpeed + rand.nextInt(maxBotSlapSpeed));
                     this.start();
                 }
 
@@ -244,7 +236,7 @@ public class Run extends Application {
                 if (humanGo && humanTake != 0 && botTake != 0 && bot.isTurn() && bot.howManyCards() > 0 && !canSlap(pile)) {
                     bot.setTurn(false);
                     timer = new Timer();
-                    timer.schedule(new BotPlay(human, bot, pile, burnPile, cardOnPile, activity, bCardsRemaining, pileCards, counter), 1500);
+                    timer.schedule(new BotPlay(human, bot, pile, burnPile, activity, bCardsRemaining, pileCards, counter, stackPane), 1500);
                 }
                 //human play to special card
                 if (pile.size() > 0 && pile.get(pile.size() - 1).isSpecial() && !canSlap(pile) && human.isTurn() && humanGo) {
@@ -270,7 +262,9 @@ public class Run extends Application {
                             activity.setText("Player takes pile. PLAYER TURN");
                             hCardsRemaining.setText("Player cards remaining: " + human.howManyCards());
                             pileCards.setText("Cards in pile: 0");
-                            cardOnPile.setImage(black);
+                            Platform.runLater(() -> {
+                                stackPane.getChildren().clear();
+                            });
                             //System.out.println("Human takes pile");
                             humanGo = true;
                             botGo = true;
@@ -299,7 +293,9 @@ public class Run extends Application {
                             activity.setText("Bot takes pile. BOT TURN");
                             bCardsRemaining.setText("Bot cards remaining: " + bot.howManyCards());
                             pileCards.setText("Cards in pile: 0");
-                            cardOnPile.setImage(black);
+                            Platform.runLater(() -> {
+                                stackPane.getChildren().clear();
+                            });
                             //System.out.println("Bot takes pile");
                             humanGo = true;
                             botGo = true;
@@ -455,11 +451,8 @@ public class Run extends Application {
             } else if (c1.getValue() == 2 && c2.getValue() == 1 && c3.getValue() == 13 && c4.getValue() == 12) {
                 //System.out.println("Four in a row3");
                 return true;
-            } else if (c1.getValue() == 3 && c2.getValue() == 2 && c3.getValue() == 1 && c4.getValue() == 13) {
-                //System.out.println("Four in a row3");
-                return true;
             } else {
-                return false;
+                return c1.getValue() == 3 && c2.getValue() == 2 && c3.getValue() == 1 && c4.getValue() == 13;
             }
         } else {
             return false;
@@ -475,11 +468,11 @@ public class Run extends Application {
         private Player bot;
         private ArrayList<Card> pile;
         private ArrayList<Card> burnPile;
-        private ImageView cardOnPile;
         private Text activity;
         private Text hCardsRemaining;
         private Text pileCards;
         private MutableInteger counter;
+        private StackPane stackPane;
 
         /**
          * Constructor for PlayerPlay.
@@ -487,22 +480,22 @@ public class Run extends Application {
          * @param bot The bot Player.
          * @param pile The ArrayList of Cards corresponding to the current pile.
          * @param burnPile The ArrayList of Cards corresponding to the burn pile.
-         * @param cardOnPile The ImageView of the top Card on pile.
          * @param activity The Text representing the activity.
          * @param hCardsRemaining The Text representing how many cards the human has left.
          * @param pileCards The Text representing how many cards are on the pile.
          * @param counter The MutableInteger keeping track of turns.
+         * @param stackPane The StackPane of cards.
          */
-        PlayerPlay(Player human, Player bot, ArrayList<Card> pile, ArrayList<Card> burnPile, ImageView cardOnPile, Text activity, Text hCardsRemaining, Text pileCards, MutableInteger counter) {
+        PlayerPlay(Player human, Player bot, ArrayList<Card> pile, ArrayList<Card> burnPile, Text activity, Text hCardsRemaining, Text pileCards, MutableInteger counter, StackPane stackPane) {
             this.human = human;
             this.bot = bot;
             this.pile = pile;
             this.burnPile = burnPile;
-            this.cardOnPile = cardOnPile;
             this.activity = activity;
             this.hCardsRemaining = hCardsRemaining;
             this.pileCards = pileCards;
             this.counter = counter;
+            this.stackPane = stackPane;
         }
 
         @Override
@@ -511,7 +504,14 @@ public class Run extends Application {
                 activity.setFill(Color.WHITE);
                 human.playCard(pile);
                 //System.out.println("Player plays outside, pile: " + burnPile +  pile);
-                cardOnPile.setImage(pile.get(pile.size() - 1).getImage());
+                ImageView card = new ImageView();
+                card.setImage(pile.get(pile.size() - 1).getImage());
+                card.setRotate(rand.nextInt(360));
+                card.setFitWidth(100);
+                card.setFitHeight(153);
+                Platform.runLater(() -> {
+                    stackPane.getChildren().add(card);
+                });
                 hCardsRemaining.setText("Player cards remaining: " + human.howManyCards());
                 int size = pile.size() + burnPile.size();
                 pileCards.setText("Cards on pile: " + size);
@@ -548,11 +548,10 @@ public class Run extends Application {
         private Player bot;
         private ArrayList<Card> pile;
         private ArrayList<Card> burnPile;
-        private ImageView cardOnPile;
-        private Image black;
         private Text activity;
         private Text hCardsRemaining;
         private Text pileCards;
+        private StackPane stackPane;
 
         /**
          * Constructor for PlayerSlap.
@@ -560,21 +559,20 @@ public class Run extends Application {
          * @param bot The bot Player.
          * @param pile The ArrayList of Cards corresponding to the current pile.
          * @param burnPile The ArrayList of Cards corresponding to the burn pile.
-         * @param cardOnPile The ImageView of the top Card on pile.
          * @param activity The Text representing the activity.
          * @param hCardsRemaining The Text representing how many cards the human has left.
          * @param pileCards The Text representing how many cards are on the pile.
+         * @param stackPane The StackPane of cards.
          */
-        PlayerSlap(Player human, Player bot, ArrayList<Card> pile, ArrayList<Card> burnPile, ImageView cardOnPile, Image black, Text activity, Text hCardsRemaining, Text pileCards) {
+        PlayerSlap(Player human, Player bot, ArrayList<Card> pile, ArrayList<Card> burnPile, Text activity, Text hCardsRemaining, Text pileCards, StackPane stackPane) {
             this.human = human;
             this.bot = bot;
             this.pile = pile;
             this.burnPile = burnPile;
-            this.cardOnPile = cardOnPile;
-            this.black = black;
             this.activity = activity;
             this.hCardsRemaining = hCardsRemaining;
             this.pileCards = pileCards;
+            this.stackPane = stackPane;
         }
 
         @Override
@@ -583,7 +581,9 @@ public class Run extends Application {
                 if (canSlap(pile)) {
                     //System.out.println("Player slaps outside, pile:" + burnPile + pile);
                     human.takePile(pile, burnPile);
-                    cardOnPile.setImage(black);
+                    Platform.runLater(() -> {
+                        stackPane.getChildren().clear();
+                    });
                     activity.setFill(Color.WHITE);
                     activity.setText("Player slaps correctly. PLAYER TURN");
                     hCardsRemaining.setText("Player cards remaining: " + human.howManyCards());
@@ -601,7 +601,6 @@ public class Run extends Application {
                     //System.out.println("Player burns card, pile: " + burnPile + pile);
                     human.burnCard(burnPile);
                     activity.setFill(Color.RED);
-                    cardOnPile.setImage(pile.get(pile.size() - 1).getImage());
                     if (activity.getText().equals("BOT TURN") || activity.getText().equals("PLAYER TURN")) {
                         activity.setText("Player slaps incorrectly. " + activity.getText());
                     } else {
@@ -631,11 +630,11 @@ public class Run extends Application {
         private Player bot;
         private ArrayList<Card> pile;
         private ArrayList<Card> burnPile;
-        private ImageView cardOnPile;
         private Text activity;
         private Text bCardsRemaining;
         private Text pileCards;
         private MutableInteger counter;
+        private StackPane stackPane;
 
         /**
          * Constructor for BotPlay.
@@ -643,22 +642,22 @@ public class Run extends Application {
          * @param bot The bot Player.
          * @param pile The ArrayList of Cards corresponding to the current pile.
          * @param burnPile The ArrayList of Cards corresponding to the burn pile.
-         * @param cardOnPile The ImageView of the top Card on pile.
          * @param activity The Text representing the activity.
          * @param bCardsRemaining The Text representing how many cards the bot has left.
          * @param pileCards The Text representing how many cards are on the pile.
          * @param counter The MutableInteger keeping track of turns.
+         * @param stackPane The StackPane of cards.
          */
-        BotPlay(Player human, Player bot, ArrayList<Card> pile, ArrayList<Card> burnPile, ImageView cardOnPile, Text activity, Text bCardsRemaining, Text pileCards, MutableInteger counter) {
+        BotPlay(Player human, Player bot, ArrayList<Card> pile, ArrayList<Card> burnPile, Text activity, Text bCardsRemaining, Text pileCards, MutableInteger counter, StackPane stackPane) {
             this.human = human;
             this.bot = bot;
             this.pile = pile;
             this.burnPile = burnPile;
-            this.cardOnPile = cardOnPile;
             this.activity = activity;
             this.bCardsRemaining = bCardsRemaining;
             this.pileCards = pileCards;
             this.counter = counter;
+            this.stackPane = stackPane;
         }
 
         @Override
@@ -667,7 +666,14 @@ public class Run extends Application {
                 bot.playCard(pile);
                 activity.setFill(Color.WHITE);
                 //System.out.println("Bot Plays outside, pile: " + burnPile + pile);
-                cardOnPile.setImage(pile.get(pile.size() - 1).getImage());
+                ImageView card = new ImageView();
+                card.setImage(pile.get(pile.size() - 1).getImage());
+                card.setRotate(rand.nextInt(360));
+                card.setFitWidth(100);
+                card.setFitHeight(153);
+                Platform.runLater(() -> {
+                    stackPane.getChildren().add(card);
+                });
                 bCardsRemaining.setText("Bot cards remaining: " + bot.howManyCards());
                 int size = pile.size() + burnPile.size();
                 pileCards.setText("Cards on pile: " + size);
@@ -705,11 +711,10 @@ public class Run extends Application {
         private Player bot;
         private ArrayList<Card> pile;
         private ArrayList<Card> burnPile;
-        private ImageView cardOnPile;
-        private Image black;
         private Text activity;
         private Text bCardsRemaining;
         private Text pileCards;
+        private StackPane stackPane;
 
         /**
          * Constructor for BotSlap.
@@ -717,21 +722,20 @@ public class Run extends Application {
          * @param bot The bot Player.
          * @param pile The ArrayList of Cards corresponding to the current pile.
          * @param burnPile The ArrayList of Cards corresponding to the burn pile.
-         * @param cardOnPile The ImageView of the top Card on pile.
          * @param activity The Text representing the activity.
          * @param bCardsRemaining The Text representing how many cards the bot has left.
          * @param pileCards The Text representing how many cards are on the pile.
+         * @param stackPane The StackPane of cards.
          */
-        BotSlap(Player human, Player bot, ArrayList<Card> pile, ArrayList<Card> burnPile, ImageView cardOnPile, Image black, Text activity, Text bCardsRemaining, Text pileCards) {
+        BotSlap(Player human, Player bot, ArrayList<Card> pile, ArrayList<Card> burnPile, Text activity, Text bCardsRemaining, Text pileCards, StackPane stackPane) {
             this.human = human;
             this.bot = bot;
             this.pile = pile;
             this.burnPile = burnPile;
-            this.cardOnPile = cardOnPile;
-            this.black = black;
             this.activity = activity;
             this.bCardsRemaining = bCardsRemaining;
             this.pileCards = pileCards;
+            this.stackPane = stackPane;
         }
 
         @Override
@@ -739,7 +743,9 @@ public class Run extends Application {
             if (pile.size() != 0 && canSlap(pile)) {
                 //System.out.println("Bot slaps pile, pile: " + burnPile + pile);
                 bot.takePile(pile, burnPile);
-                cardOnPile.setImage(black);
+                Platform.runLater(() -> {
+                    stackPane.getChildren().clear();
+                });
                 activity.setFill(Color.WHITE);
                 activity.setText("Bot slaps correctly. BOT TURN");
                 bCardsRemaining.setText("Bot cards remaining: " + bot.howManyCards());
@@ -768,7 +774,6 @@ public class Run extends Application {
         private Player bot;
         private ArrayList<Card> pile;
         private ArrayList<Card> burnPile;
-        private ImageView cardOnPile;
         private Text activity;
         private Text bCardsRemaining;
         private Text pileCards;
@@ -778,16 +783,14 @@ public class Run extends Application {
          * @param bot The bot Player.
          * @param pile The ArrayList of Cards corresponding to the current pile.
          * @param burnPile The ArrayList of Cards corresponding to the burn pile.
-         * @param cardOnPile The ImageView of the top Card on pile.
          * @param activity The Text representing the activity.
          * @param bCardsRemaining The Text representing how many cards the bot has left.
          * @param pileCards The Text representing how many cards are on the pile.
          */
-        BotMisSlap(Player bot, ArrayList<Card> pile, ArrayList<Card> burnPile, ImageView cardOnPile, Text activity, Text bCardsRemaining, Text pileCards) {
+        BotMisSlap(Player bot, ArrayList<Card> pile, ArrayList<Card> burnPile, Text activity, Text bCardsRemaining, Text pileCards) {
             this.bot = bot;
             this.pile = pile;
             this.burnPile = burnPile;
-            this.cardOnPile = cardOnPile;
             this.activity = activity;
             this.bCardsRemaining = bCardsRemaining;
             this.pileCards = pileCards;

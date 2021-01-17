@@ -90,7 +90,7 @@ public class Menu extends Application {
         instructions.setFont(Font.font("STENCIL", 15));
         instructions.setPrefSize(130, 30);
 
-        Text verAuth = new Text("v. 1.0 by Bo Han Zhu");
+        Text verAuth = new Text("v. 1.1 by Bo Han Zhu");
         verAuth.setFill(Color.WHITE);
         verAuth.setFont(Font.font("Times New Roman", FontPosture.ITALIC, 12));
 
@@ -132,6 +132,9 @@ public class Menu extends Application {
                     play.setBackground(playBackground1);
                 }
                 this.start();
+                if (instructions.isPressed()) {
+                    this.stop();
+                }
             }
         }.start();
         play.setOnAction(e -> {
