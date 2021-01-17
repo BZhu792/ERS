@@ -1,7 +1,7 @@
 # ERS
 ## Information
 ##### Author: Bo Han Zhu
-##### Version: 1.0
+##### Version: 1.1
 ##### Written In: Java, Windows Batch Script
 ##### Created Using: IntelliJ IDEA Community Edition, Notepad
 ## How to Use
@@ -15,6 +15,12 @@
 ##### Enjoy!
 ## Feedback
 ##### This is the first release. I hope you have fun but more importantly, please provide feedback to: bohanzhu9@gatech.edu!
+## Version History
+### Version 1.1
+##### Implemented StackPane to show cards instead of overlapping images.
+##### Minor bug fixes.
+### Version 1.0
+##### Initial Launch
 ## Credits
 ##### Card Images: The American Contract Bridge League (ACBL)
 ##### Space Image: https://esahubble.org/images/heic0807c/
