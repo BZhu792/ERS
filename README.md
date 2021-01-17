@@ -20,7 +20,7 @@
 ##### Implemented StackPane to show cards instead of overlapping images.
 ##### Minor bug fixes.
 ### Version 1.0
-##### Initial Launch
+##### Initial Launch.
 ## Credits
 ##### Card Images: The American Contract Bridge League (ACBL)
 ##### Space Image: https://esahubble.org/images/heic0807c/
